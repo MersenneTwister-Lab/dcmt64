@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "options.hpp"
+#include "options.h"
 
 int search(options& opt, std::ostream& os, std::ostream& log, int count);
 

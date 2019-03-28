@@ -35,7 +35,7 @@
 #include <getopt.h>
 #include "mt64Search.hpp"
 #include "search.h"
-#include "options.hpp"
+#include "options.h"
 
 using namespace std;
 using namespace MTToolBox;
@@ -54,15 +54,28 @@ int main(int argc, char** argv) {
         return -1;
     }
     ofstream ofs;
-
+    ofstream log;
+    ostream *os;
+    ostream *ls;
     if (!opt.outfilename.empty()) {
         ofs.open(opt.outfilename.c_str());
         if (!ofs) {
             cerr << "can't open file:" << opt.outfilename << endl;
             return -1;
         }
-        return search(opt, ofs, ofs, opt.count);
+        os = &ofs;
     } else {
-        return search(opt, cout, cout, opt.count);
+        os = &cout;
     }
+    if (!opt.logfilename.empty()) {
+        log.open(opt.logfilename.c_str());
+        if (!log) {
+            cerr << "can't open file:" << opt.logfilename << endl;
+            return -1;
+        }
+        ls = &log;
+    } else {
+        ls = os;
+    }
+    return search(opt, *os, *ls, opt.count);
 }

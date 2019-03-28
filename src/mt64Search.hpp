@@ -256,15 +256,17 @@ namespace MTToolBox {
          * internal id
          * @param num sequential number
          */
-        void setUpParam(ParameterGenerator& mt) {
+        void setUpParam(ParameterGenerator& mix) {
             if (fixedPOS > 0) {
                 param.pos = fixedPOS;
             } else {
-                param.pos = mt.getUint32() % (size - 1) + 1;
+                param.pos = mix.getUint64() % (size - 1) + 1;
             }
-            uint32_t work = mt.getUint32();
-            uint32_t wmat1 = (work & 0xffff0000) | (param.id & 0xffff);
-            uint32_t wmat2 = (work & 0xffff) | (param.id & 0xffff0000);
+            uint32_t seq = mix.getUint32();
+            param.seq = seq;
+            seq = seq ^ (seq << 15) ^ (seq << 23);
+            uint32_t wmat1 = (seq & 0xffff0000) | (param.id & 0xffff);
+            uint32_t wmat2 = (seq & 0xffff) | (param.id & 0xffff0000);
             wmat1 ^= wmat1 >> 19;
             wmat2 ^= wmat2 << 18;
             param.mat = wmat1;
@@ -403,10 +405,10 @@ namespace MTToolBox {
         bool isReverseOutput() {
             return reverse_bit_flag;
         }
-        int getID() {
+        uint32_t getID() {
             return param.id;
         }
-        int getSEQ() {
+        uint32_t getSEQ() {
             return param.seq;
         }
     private:
