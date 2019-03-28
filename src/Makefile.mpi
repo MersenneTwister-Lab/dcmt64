@@ -1,0 +1,27 @@
+# -*- mode:makefile -*-
+WARN = -Wall -Wextra
+#ICPCOPT = -parallel -ip -xSKYLAKE-AVX512 #-xCORE-AVX2 –xCORE-AVX512
+#ICPCOPT = -ip -xSKYLAKE-AVX512 #-xCORE-AVX2 –xCORE-AVX512
+GXXOPT = -march=native
+OPTI = -O3 $(ICPCOPT) $(GXXOPT)
+CXX = g++
+#CXX = mpicxx
+#CXX = icpc
+#CXX = clang++
+STD = -std=c++11
+#LIB = -lpthread -lmpi -lgmp -lMTToolBox -lntl
+LIB = -lpthread -lmpi -lmpi++ -lgmp -lMTToolBox -lntl
+CXXFLAGS = -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS $(OPTI) \
+$(WARN) $(STD)
+
+dcmt64:dcmt64.o
+	$(CXX) $(CXXFLAGS) $(LIB) -o $@ dcmt64.o
+
+dcmt64.o:dcmt64.cpp mt64Search.hpp mpicontrol.hpp
+	$(CXX) $(CXXFLAGS) -c dcmt64.cpp
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $<
+
+clean:
+	rm -f *.o *~
