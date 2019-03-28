@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
     AlgorithmEquidistribution<uint64_t> equi(mt, 64, opt.params.mexp);
     delta = equi.get_all_equidist(veq);
     cout << mt.getParamString();
-    cout << dec << delta << endl;
+    cout << "," << dec << delta << endl;
     if (opt.verbose) {
         cout << "64bit dimension of equidistribution at v-bit accuracy k(v)"
              << endl;
@@ -101,6 +101,8 @@ namespace {
         } else {
             char * para = argv[0];
             opt.params.mexp = strtoul(para, &para, 10);
+            para++;
+            opt.params.id = strtoul(para, &para, 10);
             para++;
             opt.params.pos = strtoul(para, &para, 10);
             para++;

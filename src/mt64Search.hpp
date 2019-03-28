@@ -23,16 +23,13 @@
 #include <cstdlib>
 #include <sstream>
 #include <MTToolBox/ReducibleGenerator.hpp>
-#include <MTToolBox/MersenneTwister64.hpp>
-#include <MTToolBox/AlgorithmPartialBitPattern.hpp>
+#include <MTToolBox/TemperingCalculatable.hpp>
 #include <MTToolBox/util.hpp>
 
 namespace MTToolBox {
     using namespace NTL;
     using namespace std;
 
-    typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 47, 5> stsl1;
-    typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 27, 5> stsl2;
     /**
      * @class mt64_param
      * @brief a class keeping parameters of mt64
@@ -388,6 +385,7 @@ namespace MTToolBox {
          * @param src_bit only 0 is allowed
          */
         void setTemperingPattern(uint64_t mask, uint64_t pattern, int src_bit) {
+#if 0
             if (src_bit == 0) {
                 param.tmsk1 &= ~mask;
                 param.tmsk1 |= pattern & mask;
@@ -395,6 +393,16 @@ namespace MTToolBox {
                 param.tmsk2 &= ~mask;
                 param.tmsk2 |= pattern & mask;
             }
+#else
+            UNUSED_VARIABLE(&src_bit);
+            if (tmpidx == 0) {
+                param.tmsk1 &= ~mask;
+                param.tmsk1 |= pattern & mask;
+            } else {
+                param.tmsk2 &= ~mask;
+                param.tmsk2 |= pattern & mask;
+            }
+#endif
         }
         void setReverseOutput() {
             reverse_bit_flag = true;
@@ -410,6 +418,9 @@ namespace MTToolBox {
         }
         uint32_t getSEQ() {
             return param.seq;
+        }
+        void setTmpIdx(int idx) {
+            tmpidx = idx;
         }
     private:
         void make_mask(int mexp) {
@@ -427,6 +438,7 @@ namespace MTToolBox {
         int fixedPOS;
         int size;
         int index;
+        int tmpidx;
         uint64_t * state;
         mt64_param param;
         uint64_t upper_mask;
