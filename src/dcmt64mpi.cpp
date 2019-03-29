@@ -1,5 +1,5 @@
 /**
- * @file dcmt64.cpp
+ * @file dcmt64mpi.cpp
  *
  * @brief The main function of parameter generator of 64 bit Mersenne Twister.
  *
@@ -33,6 +33,7 @@
 #include <MTToolBox/MersenneTwister.hpp>
 #include <NTL/GF2X.h>
 #include <getopt.h>
+#include "mpicontrol.hpp"
 #include "mt64Search.hpp"
 #include "search.h"
 #include "options.h"
@@ -48,11 +49,31 @@ using namespace NTL;
  * @return 0 if this ends normally
  */
 int main(int argc, char** argv) {
+    MPIControl mpi(&argc, &argv);
     options opt;
     bool parse = parse_opt(opt, argc, argv);
     if (!parse) {
         return -1;
     }
+    // MPI
+    char buff[200];
+    opt.id = opt.id + mpi.getRank();
+    //if (opt.mexp == 19937) {
+    //    opt.fixedPOS = 156;
+    //    opt.max_defect = 8000; // mt19937-64 is 7820
+    //}
+    //opt.seq; count down, -1 means uint32_t max
+    //opt.count;
+    //opt.logcount;
+    if (!opt.outfilename.empty()) {
+        sprintf(buff, ".s%04ld-%03d.txt", opt.seed, mpi.getRank());
+        opt.outfilename += buff;
+    }
+    if (!opt.logfilename.empty()) {
+        sprintf(buff, ".s%04ld-%03d.log", opt.seed, mpi.getRank());
+        opt.logfilename += buff;
+    }
+    // MPI end
     ofstream ofs;
     ofstream log;
     ostream *os;
@@ -78,5 +99,5 @@ int main(int argc, char** argv) {
         ls = os;
     }
     return search(opt, *os, *ls, opt.count);
-    //return best_search(opt, *os, *ls, opt.count);
+    //return best_search(opt, *os, *ls, opt.count); bug? or too slow?
 }

@@ -24,11 +24,13 @@
 class options {
 public:
     int mexp;                   // mersenne exponent (required)
-    int id;                     // id (required)
+    int64_t id;                 // id (required)
     bool verbose;               // verbose mode (optional)
     long seq;                   // start seq no (optional) -1 means use default
     int fixedPOS;               // fix pos parameter -1 means not fix
     uint64_t seed;              // if pos is fixed not used
+    int max_defect;             // max defect.
+                                // defect larger than this will be skipped.
     std::string outfilename;    // parameter output file
     std::string logfilename;    // log output file
     long count;                 // number of parameters you want to get

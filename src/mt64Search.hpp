@@ -385,24 +385,21 @@ namespace MTToolBox {
          * @param src_bit only 0 is allowed
          */
         void setTemperingPattern(uint64_t mask, uint64_t pattern, int src_bit) {
-#if 0
-            if (src_bit == 0) {
+            if (tmpidx < 0) { // Algorithm BestBits
+                if (src_bit == 0) {
+                    param.tmsk1 &= ~mask;
+                    param.tmsk1 |= pattern & mask;
+                } else {
+                    param.tmsk2 &= ~mask;
+                    param.tmsk2 |= pattern & mask;
+                }
+            } else if (tmpidx == 0) { // Algorithm Partial Bit pattern
                 param.tmsk1 &= ~mask;
                 param.tmsk1 |= pattern & mask;
-            } else {
+            } else if (tmpidx == 1) { // Algorithm Partial Bit pattern
                 param.tmsk2 &= ~mask;
                 param.tmsk2 |= pattern & mask;
             }
-#else
-            UNUSED_VARIABLE(&src_bit);
-            if (tmpidx == 0) {
-                param.tmsk1 &= ~mask;
-                param.tmsk1 |= pattern & mask;
-            } else {
-                param.tmsk2 &= ~mask;
-                param.tmsk2 |= pattern & mask;
-            }
-#endif
         }
         void setReverseOutput() {
             reverse_bit_flag = true;

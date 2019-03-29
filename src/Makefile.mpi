@@ -14,11 +14,12 @@ LIB = -lpthread -lmpi -lmpi++ -lgmp -lMTToolBox -lntl
 CXXFLAGS = -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS $(OPTI) \
 $(WARN) $(STD)
 
-dcmt64:dcmt64.o
-	$(CXX) $(CXXFLAGS) $(LIB) -o $@ dcmt64.o
+dcmt64mpi:dcmt64mpi.o search.o options.o
+	$(CXX) $(CXXFLAGS) -o $@ dcmt64mpi.o search.o options.o \
+	$(LIB)
 
-dcmt64.o:dcmt64.cpp mt64Search.hpp mpicontrol.hpp
-	$(CXX) $(CXXFLAGS) -c dcmt64.cpp
+dcmt64mpi.o:dcmt64mpi.cpp mt64Search.hpp mpicontrol.hpp search.h options.h
+	$(CXX) $(CXXFLAGS) -c dcmt64mpi.cpp
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $<

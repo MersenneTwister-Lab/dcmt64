@@ -1,5 +1,5 @@
 /**
- * @file search.cpp
+ * @file best_search.cpp
  *
  * @brief search function of parameter generator of 64 bit Mersenne Twister.
  *
@@ -43,7 +43,7 @@ using namespace MTToolBox;
 using namespace NTL;
 
 namespace {
-    int search_main(options& opt, ostream& os, ostream& log, int count);
+    int best_search_main(options& opt, ostream& os, ostream& log, int count);
 }
 
 /**
@@ -52,9 +52,9 @@ namespace {
  * @param count number of parameters user requested
  * @return 0 if this ends normally
  */
-int search(options& opt, ostream& os, ostream& log, int count) {
+int best_search(options& opt, ostream& os, ostream& log, int count) {
     try {
-        return search_main(opt, os, log, count);
+        return best_search_main(opt, os, log, count);
     } catch (underflow_error &e) {
         log << "# search end: sequence has wasted out." << endl;
         return 0;
@@ -62,12 +62,7 @@ int search(options& opt, ostream& os, ostream& log, int count) {
 }
 
 namespace {
-    int search_main(options& opt, ostream& os, ostream& log, int count) {
-        typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 47, 5> stsl1;
-        typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 27, 5> stsl2;
-
-        stsl1 apbp1;
-        stsl2 apbp2;
+    int best_search_main(options& opt, ostream& os, ostream& log, int count) {
         uint32_t seq = 0;
         seq = ~seq;
         if (opt.seq > 0) {
@@ -75,9 +70,9 @@ namespace {
         }
         MixedSequence mx(seq, opt.seed, 0);
         mt64 g(opt.mexp, opt.id);
-        //static const int shifts[] = {17, 37};
-        // limit_v 何ビットテンパリングするか とりあえず 15のまま
-        //AlgorithmBestBits<uint32_t> tmp(64, shifts, 2, 15);
+        static const int shifts[] = {17, 37};
+        //limit_v 何ビットテンパリングするか とりあえず 15のまま
+        AlgorithmBestBits<uint64_t> besttmp(64, shifts, 2, 15);
         if (opt.verbose) {
             time_t t = time(NULL);
             log << "#search start id = " << opt.id << " at " << ctime(&t) << endl;
@@ -87,7 +82,7 @@ namespace {
         if (opt.fixedPOS > 0) {
             g.setFixedPOS(opt.fixedPOS);
         }
-
+        g.setTmpIdx(-1);
         AlgorithmRecursionSearch<uint64_t> ars(g, mx);
         long cnt = 0;
         os << "# " << g.getHeaderString() << ", delta"
@@ -97,10 +92,7 @@ namespace {
                 log << "# search found: " << dec << g.getID()
                     << ", " << g.getSEQ()
                     << "; tempering search start..." << endl;
-                g.setTmpIdx(0);
-                apbp1(g, false);
-                g.setTmpIdx(1);
-                apbp2(g, false);
+                besttmp(g, false);
                 AlgorithmEquidistribution<uint64_t> equi(g, 64, opt.mexp);
                 int veq[64];
                 int delta = equi.get_all_equidist(veq);

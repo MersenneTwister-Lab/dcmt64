@@ -27,14 +27,14 @@ CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 CC="$PTHREAD_CC"
 
 # Open MPI compiler
-AC_ARG_ENABLE([mpi],
-        AS_HELP_STRING([--enable-mpi], [make open mpi search executables]))
-AM_CONDITIONAL([MPI], [test x$enable_mpi = xyes])
+#AC_ARG_ENABLE([mpi],
+#        AS_HELP_STRING([--enable-mpi], [make open mpi search executables]))
+#AM_CONDITIONAL([MPI], [test x$enable_mpi = xyes])
 
-if test !AS_VAR_TEST_SET([MPICXX]); then
-  AS_VAR_SET([MPICXX], [`which mpicxx`])
-fi
-AC_SUBST(MPICXX)
+#if test !AS_VAR_TEST_SET([MPICXX]); then
+#  AS_VAR_SET([MPICXX], [`which mpicxx`])
+#fi
+#AC_SUBST(MPICXX)
 
 # gcc arch flag
 #AX_GCC_ARCHFLAG
