@@ -1,0 +1,84 @@
+\documentclass{article}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage[dvipdfm]{graphicx}
+%\usepackage{color}
+%\usepackage[bottom]{footmisc}
+
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{conjecture}[theorem]{Conjecture}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newdef{definition}[theorem]{Definition}
+%\newdef{remark}[theorem]{Remark}
+
+\def\F2{{\mathbb F}_2}
+%\def\wt{{\rm wt}}
+%\def\wo{{\rm wt}_o}
+%\def\wf{{\rm wt}_f}
+%\def\UL{{\rm ul}}
+%\def\bx{{{\mathbf x}}}
+%\def\by{{{\mathbf y}}}
+%\def\bz{{{\mathbf z}}}
+%\def\bw{{{\mathbf w}}}
+%\def\bu{{{\mathbf u}}}
+
+%\def\im{{\mathrm{Im}}}
+%\def\ker{{\mathrm{Ker}}}
+%\def\id{{\mathrm{Id}}}
+%\def\tr{{\mathrm{tr}}}
+
+\title{Technical Report: Dynamic Creator of 64-bit Mersenne Twister}
+\author{Mutsuo Saito \and Makoto Matsumoto}
+\date{2019-5-13}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  On this report, we describe a dynamic creation program for 64-bit
+  Mersenne Twister.
+\end{abstract}
+
+\keywords{
+Mersenne Twister; Dynamic Creation; Pseudorandom Number; Parallel Computing
+}
+
+%\category{G.3}{Mathematics of Computing}{PROBABILITY AND STATISTICS}[Random number generation]
+
+\section{Introduction}
+
+Dynamic Creation of Pserudorandom Number Generators (DC)~\cite{DC} was
+proposed by Matsumoto and Nishimura and a program for 32-bit Mersenne
+Twister (MT)~\cite{MT} written in C is published on web page
+\url{http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/DC/dc.html} and
+Git Hub \url{https://github.com/MersenneTwister-Lab/dcmt}.
+64-bit Mersenne Twister (MT64)~\cite{MT64} was proposed by the same
+authors of DC, Matsumoto and Nishimura, but　dynamic creation program
+for MT64 has not been supported.
+
+There is a difficulty in calculating tempering parameter of MT64.  In
+MT and MT64, the best tempering parameter is searched in some
+condition (for tempering parameter and its calculating algorithm, see
+\cite{MT, MT64}).
+
+\begin{quote}
+  In \cite{TGFSRII}\cite{MT}, our tempering strategy is back-tracking
+  to obtain nealy optimal $k(v)$, but here in DC, we adopted more a
+  greedy algorithm, i.e. we obtain tempering parameter from
+  $v = 1, 2 ..., i,$ then $v = i + 1$ tempering parameter is searched
+  so that $k(i+1)$ attains the maximal for the possible tempering
+  parameters, with fixed parameter for $v = 1, ..., i$.
+\end{quote}
+
+The greeding algorithm still takes too much time in the case of 64-bit
+MT.  Now, we give up the greeding algorthm and take a so-so good
+altanative.
+
+
+\bibliographystyle{plain}
+\bibliography{sfmt-kanren}
+\end{document}
