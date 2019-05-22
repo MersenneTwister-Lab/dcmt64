@@ -76,7 +76,15 @@ condition (for tempering parameter and its calculating algorithm, see
 
 The greeding algorithm still takes too much time in the case of 64-bit
 MT.  Now, we give up the greeding algorthm and take a so-so good
-altanative.
+altanative. we adopted ``Partial Bit Pattern'' algorithm, which is the
+algorithm we used in Mersenne Twister of Graphic Processors
+(MTGP)~\cite{MTGP}.  The algorithm separates tempering parameters some
+bit blocks and selects a bit pattern which gives the best $k(v)$ in
+the blocks.　Note, we talk about searching tempering paramaeter
+algorithm, the tempering algorithm itself are different from MTGP.
+
+\section*{Speed}
+
 
 
 \bibliographystyle{plain}

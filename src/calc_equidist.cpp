@@ -14,6 +14,7 @@ class options {
 public:
     bool verbose;
     bool reverse;
+    bool period;
     uint64_t seed;
     mt64_param params;
 };
@@ -21,7 +22,9 @@ public:
 namespace {
     bool parse_opt(options& opt, int argc, char **argv);
     void output_help(string& pgm);
+    bool check_period(mt64& mt);
 }
+
 
 int main(int argc, char * argv[])
 {
@@ -31,6 +34,13 @@ int main(int argc, char * argv[])
     }
     mt64 mt(opt.params);
     mt.seed(opt.seed);
+    if (opt.period) {
+        if (check_period(mt)) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
     int delta = 0;
     int veq[64];
     AlgorithmEquidistribution<uint64_t> equi(mt, 64, opt.params.mexp);
@@ -60,17 +70,19 @@ namespace {
      */
     bool parse_opt(options& opt, int argc, char **argv) {
         opt.verbose = false;
+        opt.period = false;
         opt.seed = 0;
         int c;
         bool error = false;
         string pgm = argv[0];
         static struct option longopts[] = {
             {"verbose", no_argument, NULL, 'v'},
+            {"period", no_argument, NULL, 'p'},
             {"seed", required_argument, NULL, 's'},
             {NULL, 0, NULL, 0}};
         errno = 0;
         for (;;) {
-            c = getopt_long(argc, argv, "vs:", longopts, NULL);
+            c = getopt_long(argc, argv, "vps:", longopts, NULL);
             if (error) {
                 break;
             }
@@ -87,6 +99,9 @@ namespace {
                 break;
             case 'v':
                 opt.verbose = true;
+                break;
+            case 'p':
+                opt.period = true;
                 break;
             case '?':
             default:
@@ -126,12 +141,33 @@ namespace {
     {
         cerr << "usage:" << endl;
         cerr << pgm
-             << " [-v] [-r]"
+             << " [-v] [-s seed] [-p]"
              << " mexp,pos,mat,tmsk1,tmsk2"
              << endl;
         static string help_string1 = "\n"
             "--verbose, -v        Verbose mode. Output detailed information.\n"
+            "--period, -p         period chek only.\n"
+            "--seed, -s seed      seed for generation.\n"
             ;
         cerr << help_string1 << endl;
     }
+
+    bool check_period(mt64& mt)
+    {
+        GF2X poly;
+        minpoly<uint64_t>(poly, mt);
+        cout << "deg(poly) = " << dec << deg(poly) << endl;
+        if (deg(poly) != mt.getMexp()) {
+            cout << "deg(poly) is not mexp. NG." << endl;
+            return false;
+        }
+        if (isPrime(poly)) {
+            cout << "poly is prime. OK." << endl;
+            return true;
+        } else {
+            cout << "poly is not prime. NG." << endl;
+            return false;
+        }
+    }
+
 }
