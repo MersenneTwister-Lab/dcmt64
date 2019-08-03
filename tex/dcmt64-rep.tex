@@ -1,8 +1,10 @@
 \documentclass{article}
 \usepackage{amssymb}
-\usepackage{url}
 \usepackage{amsmath}
+\usepackage{url}
+\usepackage{comment}
 \usepackage[dvipdfm]{graphicx}
+\usepackage[dvipdfm,truedimen,margin=25mm, nohead]{geometry}
 %\usepackage{color}
 %\usepackage[bottom]{footmisc}
 
@@ -32,7 +34,7 @@
 
 \title{Technical Report: Dynamic Creator of 64-bit Mersenne Twister}
 \author{Mutsuo Saito \and Makoto Matsumoto}
-\date{2019-5-13}
+\date{2019-8-3}
 
 \begin{document}
 
@@ -43,49 +45,65 @@
   Mersenne Twister.
 \end{abstract}
 
-\keywords{
-Mersenne Twister; Dynamic Creation; Pseudorandom Number; Parallel Computing
-}
+%\keywords{
+%Mersenne Twister; Dynamic Creation; Pseudorandom Number; Parallel Computing
+%}
 
 %\category{G.3}{Mathematics of Computing}{PROBABILITY AND STATISTICS}[Random number generation]
 
-\section{Introduction}
+\subsection*{Improvement}
 
 Dynamic Creation of Pserudorandom Number Generators (DC)~\cite{DC} was
 proposed by Matsumoto and Nishimura and a program for 32-bit Mersenne
 Twister (MT)~\cite{MT} written in C is published on web page
 \url{http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/DC/dc.html} and
-Git Hub \url{https://github.com/MersenneTwister-Lab/dcmt}.
-64-bit Mersenne Twister (MT64)~\cite{MT64} was proposed by the same
-authors of DC, Matsumoto and Nishimura, but　dynamic creation program
-for MT64 has not been supported.
+Git Hub \url{https://github.com/MersenneTwister-Lab/dcmt}.  64-bit
+Mersenne Twister (MT64)~\cite{MT64} was proposed by Nishimura,
+but　dynamic creation program for MT64 has not been supported.
 
-There is a difficulty in calculating tempering parameter of MT64.  In
-MT and MT64, the best tempering parameter is searched in some
-condition (for tempering parameter and its calculating algorithm, see
-\cite{MT, MT64}).
-
-\begin{quote}
-  In \cite{TGFSRII}\cite{MT}, our tempering strategy is back-tracking
-  to obtain nealy optimal $k(v)$, but here in DC, we adopted more a
-  greedy algorithm, i.e. we obtain tempering parameter from
-  $v = 1, 2 ..., i,$ then $v = i + 1$ tempering parameter is searched
-  so that $k(i+1)$ attains the maximal for the possible tempering
-  parameters, with fixed parameter for $v = 1, ..., i$.
-\end{quote}
-
-The greeding algorithm still takes too much time in the case of 64-bit
-MT.  Now, we give up the greeding algorthm and take a so-so good
-altanative. we adopted ``Partial Bit Pattern'' algorithm, which is the
-algorithm we used in Mersenne Twister of Graphic Processors
+There was a difficulty in calculating tempering parameter of MT64.
+Two tempering parameter sizes of MT are 25 and 17 bits, on the other
+hand, those of MT64 are 47 and 27 bits.  Increased sizes of tempering
+parameters made dynamic creation very slow and impractical. To solve
+this difficulty, now, we adopt ``Partial Bit Pattern'' algorithm,
+which is the algorithm used in Mersenne Twister of Graphic Processors
 (MTGP)~\cite{MTGP}.  The algorithm separates tempering parameters some
 bit blocks and selects a bit pattern which gives the best $k(v)$ in
-the blocks.　Note, we talk about searching tempering paramaeter
-algorithm, the tempering algorithm itself are different from MTGP.
+the blocks.　(Note: we talk about the algorithm of searching tempering
+paramaeters. The tempering algorithm itself of MT64 is not changed.)
 
-\section*{Speed}
+\subsection*{Results of the Dynamic Creation}
 
+We made C++ program
+dcmt64(\url{https://github.com/MersenneTwister-Lab/dcmt64}).  We
+executed the program on Super Computer of The Institute of Statistical
+Mathematics(ISM) in Japan.
 
+\begin{center}
+  Execution Environment:\\
+  \medskip
+\begin{tabular}{rl} \hline
+  CPU & Intel Xeon Gold 6154 (18 core, 3.0GHz)\\
+  Memory & 384GB \\
+  OS & Red Hat Linux Enterprise Server 7\\
+  Compiler & g++ \\
+  \hline
+\end{tabular}
+
+\bigskip
+Execution Results:\\
+\medskip
+\begin{tabular}{ll|ll} \hline
+  used time & 10h & used process & 36 \\ \hline
+  specified mexp & 19937 & parameters found & 1161 \\
+  \hline
+\end{tabular}
+\end{center}
+
+Dimension defect(DD)\cite[\S 1.2]{MT} is a simple evaluation index of
+$F2$-linear random number generators. The less DD is the better.
+The minimum DD of found parameters is 5023 and the maximum one
+is 25258. 95 percent parameters have DD less than 7000.
 
 \bibliographystyle{plain}
 \bibliography{sfmt-kanren}
