@@ -57,7 +57,8 @@ AC_CHECK_HEADERS([inttypes.h stdint.h stdlib.h])
 AC_LANG_PUSH(C++)
 AX_CXX_COMPILE_STDCXX_0X
 
-AX_CXX_COMPILE_STDCXX_14(noext, optional) # keep this order
+AX_CXX_COMPILE_STDCXX_17(noext, optional) # keep this order
+AX_CXX_COMPILE_STDCXX_14(noext, optional)
 AX_CXX_COMPILE_STDCXX_11(noext, optional)
 AC_LANG_POP
 

@@ -1,4 +1,5 @@
 #include "mt64Search.hpp"
+#include "mt64Rec2Search.hpp"
 #include <MTToolBox/AlgorithmEquidistribution.hpp>
 #include <MTToolBox/AlgorithmReducibleRecursionSearch.hpp>
 #include <MTToolBox/period.hpp>
@@ -15,14 +16,19 @@ public:
     bool verbose;
     bool reverse;
     bool period;
+    int rectype;
     uint64_t seed;
     mt64_param params;
+    mt64rec2_param paramsrec2;
 };
 
 namespace {
     bool parse_opt(options& opt, int argc, char **argv);
     void output_help(string& pgm);
-    bool check_period(mt64& mt);
+    template<class G>
+    void calc(G& mt, options& opt, int mexp, bool verbose);
+    template<class G>
+    bool check_period(G& mt);
 }
 
 
@@ -32,15 +38,14 @@ int main(int argc, char * argv[])
     if (!parse_opt(opt, argc, argv)) {
         return -1;
     }
-    mt64 mt(opt.params);
-    mt.seed(opt.seed);
-    if (opt.period) {
-        if (check_period(mt)) {
-            return 0;
-        } else {
-            return -1;
-        }
+    if (opt.rectype == 3) {
+        mt64 mt(opt.params);
+        calc(mt, opt, opt.params.mexp, opt.verbose);
+    } else if (opt.rectype == 2) {
+        mt64rec2 mt(opt.paramsrec2);
+        calc(mt, opt, opt.paramsrec2.mexp, opt.verbose);
     }
+#if 0
     int delta = 0;
     int veq[64];
     AlgorithmEquidistribution<uint64_t> equi(mt, 64, opt.params.mexp);
@@ -56,6 +61,7 @@ int main(int argc, char * argv[])
                  << (opt.params.mexp / (j + 1) - veq[j]) << endl;
         }
     }
+#endif
     return 0;
 }
 
@@ -71,6 +77,7 @@ namespace {
     bool parse_opt(options& opt, int argc, char **argv) {
         opt.verbose = false;
         opt.period = false;
+        opt.rectype = 3;
         opt.seed = 0;
         int c;
         bool error = false;
@@ -78,11 +85,12 @@ namespace {
         static struct option longopts[] = {
             {"verbose", no_argument, NULL, 'v'},
             {"period", no_argument, NULL, 'p'},
+            {"rectype", required_argument, NULL, 'r'},
             {"seed", required_argument, NULL, 's'},
             {NULL, 0, NULL, 0}};
         errno = 0;
         for (;;) {
-            c = getopt_long(argc, argv, "vps:", longopts, NULL);
+            c = getopt_long(argc, argv, "vps:r:", longopts, NULL);
             if (error) {
                 break;
             }
@@ -95,6 +103,13 @@ namespace {
                 if (errno) {
                     error = true;
                     cerr << "seed must be a number" << endl;
+                }
+                break;
+            case 'r':
+                opt.rectype = strtoull(optarg, NULL, 0);
+                if (errno || opt.rectype < 1 || opt.rectype > 3) {
+                    error = true;
+                    cerr << "rectype must be 1, 2, 3" << endl;
                 }
                 break;
             case 'v':
@@ -113,7 +128,33 @@ namespace {
         argv += optind;
         if (argc < 1) {
             error = true;
-        } else {
+        } else if (opt.rectype == 1) {
+        } else if (opt.rectype == 2) {
+            char * para = argv[0];
+            opt.paramsrec2.mexp = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.id = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.pos1 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.pos2 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.pos3 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.mat = strtoull(para, &para, 16);
+            para++;
+            opt.paramsrec2.tsh0 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.tsh1 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.tsh2 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.tsh3 = strtoul(para, &para, 10);
+            para++;
+            opt.paramsrec2.tmsk1 = strtoull(para, &para, 16);
+            para++;
+            opt.paramsrec2.tmsk2 = strtoull(para, &para, 16);
+        } else if (opt.rectype == 3) {
             char * para = argv[0];
             opt.params.mexp = strtoul(para, &para, 10);
             para++;
@@ -141,8 +182,9 @@ namespace {
     {
         cerr << "usage:" << endl;
         cerr << pgm
-             << " [-v] [-s seed] [-p]"
-             << " mexp,pos,mat,tmsk1,tmsk2"
+             << " [-v] [-s seed] [-p] [-r rectype]\n"
+             << " mexp,pos,mat,tmsk1,tmsk2\n"
+             << " mexp,pos1,pos2,pos3,mat,tsh0,tsh1,tsh2,tsh3,tmsk1,tmsk2"
              << endl;
         static string help_string1 = "\n"
             "--verbose, -v        Verbose mode. Output detailed information.\n"
@@ -152,7 +194,8 @@ namespace {
         cerr << help_string1 << endl;
     }
 
-    bool check_period(mt64& mt)
+    template<class G>
+    bool check_period(G& mt)
     {
         GF2X poly;
         minpoly<uint64_t>(poly, mt);
@@ -167,6 +210,33 @@ namespace {
         } else {
             cout << "poly is not prime. NG." << endl;
             return false;
+        }
+    }
+
+    template<class G>
+    void calc(G& mt, options& opt, int mexp, bool verbose)
+    {
+        //mt64 mt(opt.params);
+        mt.seed(opt.seed);
+        if (opt.period) {
+            check_period(mt);
+            return;
+        }
+
+        int delta = 0;
+        int veq[64];
+        AlgorithmEquidistribution<uint64_t> equi(mt, 64, mexp);
+        delta = equi.get_all_equidist(veq);
+        cout << mt.getParamString();
+        cout << "," << dec << delta << endl;
+        if (verbose) {
+            cout << "64bit dimension of equidistribution at v-bit accuracy k(v)"
+                 << endl;
+            for (int j = 0; j < 64; j++) {
+                cout << "k(" << dec << (j + 1) << ") = " << dec << veq[j];
+                cout << "\td(" << dec << (j + 1) << ") = " << dec
+                     << (opt.params.mexp / (j + 1) - veq[j]) << endl;
+            }
         }
     }
 
