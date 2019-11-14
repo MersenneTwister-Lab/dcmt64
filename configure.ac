@@ -27,14 +27,14 @@ CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 CC="$PTHREAD_CC"
 
 # Open MPI compiler
-#AC_ARG_ENABLE([mpi],
-#        AS_HELP_STRING([--enable-mpi], [make open mpi search executables]))
-#AM_CONDITIONAL([MPI], [test x$enable_mpi = xyes])
+##AC_ARG_ENABLE([mpi],
+##        AS_HELP_STRING([--enable-mpi], [make open mpi search executables]))
+##AM_CONDITIONAL([MPI], [test x$enable_mpi = xyes])
 
-#if test !AS_VAR_TEST_SET([MPICXX]); then
-#  AS_VAR_SET([MPICXX], [`which mpicxx`])
-#fi
-#AC_SUBST(MPICXX)
+##if test !AS_VAR_TEST_SET([MPICXX]); then
+##  AS_VAR_SET([MPICXX], [`which mpicxx`])
+##fi
+##AC_SUBST(MPICXX)
 
 # gcc arch flag
 #AX_GCC_ARCHFLAG
@@ -55,10 +55,10 @@ AC_CHECK_HEADERS([inttypes.h stdint.h stdlib.h])
 #AC_TYPE_UINT64_T
 
 AC_LANG_PUSH(C++)
-AX_CXX_COMPILE_STDCXX_0X
+#AX_CXX_COMPILE_STDCXX_0X
 
-AX_CXX_COMPILE_STDCXX_17(noext, optional) # keep this order
-AX_CXX_COMPILE_STDCXX_14(noext, optional)
+#AX_CXX_COMPILE_STDCXX_17(noext, optional) # keep this order
+#AX_CXX_COMPILE_STDCXX_14(noext, optional)
 AX_CXX_COMPILE_STDCXX_11(noext, optional)
 AC_LANG_POP
 

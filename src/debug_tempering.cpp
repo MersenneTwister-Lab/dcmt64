@@ -28,7 +28,7 @@ namespace {
     bool parse_opt(options& opt, int argc, char **argv);
     void output_help(string& pgm);
     template<class G>
-    void calc(G& mt, options& opt, int mexp, bool verbose);
+    void search_tempering(G& mt, options& opt, int mexp, bool verbose);
     template<class G>
     bool check_period(G& mt);
 }
@@ -45,19 +45,19 @@ int main(int argc, char * argv[])
         if (opt.verbose) {
             cout << opt.paramsrec1.get_debug_string() << endl;
         }
-        calc(mt, opt, opt.paramsrec1.mexp, opt.verbose);
+        search_tempering(mt, opt, opt.paramsrec1.mexp, opt.verbose);
     } else if (opt.rectype == 2) {
         mt64rec2 mt(opt.paramsrec2);
         if (opt.verbose) {
             cout << opt.paramsrec2.get_debug_string() << endl;
         }
-        calc(mt, opt, opt.paramsrec2.mexp, opt.verbose);
+        search_tempering(mt, opt, opt.paramsrec2.mexp, opt.verbose);
     } else if (opt.rectype == 3) {
         mt64 mt(opt.params);
         if (opt.verbose) {
             cout << opt.params.get_debug_string() << endl;
         }
-        calc(mt, opt, opt.params.mexp, opt.verbose);
+        search_tempering(mt, opt, opt.params.mexp, opt.verbose);
     }
     return 0;
 }
@@ -239,28 +239,28 @@ namespace {
     }
 
     template<class G>
-    void calc(G& mt, options& opt, int mexp, bool verbose)
+    void search_tempering(G& mt, options& opt, int mexp, bool verbose)
     {
-        //mt64 mt(opt.params);
-        mt.seed(opt.seed);
-        if (opt.period) {
-            check_period(mt);
-            return;
-        }
-        int delta = 0;
+        // 64 - 17 = 47
+        // 64 - 37 = 27
+        typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 47, 5> stsl1;
+        typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 27, 5> stsl2;
+
+        stsl1 apbp1;
+        stsl2 apbp2;
+        mt.setTmpIdx(0);
+        apbp1(mt, false);
+        mt.setTmpIdx(1);
+        apbp2(mt, false);
+        AlgorithmEquidistribution<uint64_t> equi(mt, 64, opt.mexp);
         int veq[64];
-        AlgorithmEquidistribution<uint64_t> equi(mt, 64, mexp);
-        delta = equi.get_all_equidist(veq);
-        cout << mt.getParamString();
-        cout << "," << dec << delta << endl;
-        if (verbose) {
-            cout << "64bit dimension of equidistribution at v-bit accuracy k(v)"
-                 << endl;
-            for (int j = 0; j < 64; j++) {
-                cout << "k(" << dec << (j + 1) << ") = " << dec << veq[j];
-                cout << "\td(" << dec << (j + 1) << ") = " << dec
-                     << (mexp / (j + 1) - veq[j]) << endl;
-            }
+        int delta = equi.get_all_equidist(veq);
+        os << g.getParamString();
+        os << "," << dec << delta << endl;
+        for (int j = 0; j < 64; j++) {
+            cout << "k(" << dec << (j + 1) << ") = " << dec << veq[j];
+            cout << "\td(" << dec << (j + 1) << ") = " << dec
+                 << (opt.mexp / (j + 1) - veq[j]) << endl;
         }
     }
 

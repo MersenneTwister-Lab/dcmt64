@@ -104,7 +104,14 @@ namespace MTToolBox {
             ss << "tmsk1:" << hex << setw(16) << setfill('0') << tmsk1 << endl;
             ss << "tmsk2:" << hex << setw(16) << setfill('0') << tmsk2 << endl;
             string s;
-            ss >> s;
+            string t;
+            while (ss) {
+                ss >> t;
+                if (!ss) {
+                    break;
+                }
+                s = s + t + '\n';
+            }
             return s;
         }
     };

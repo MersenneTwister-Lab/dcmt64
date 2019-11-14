@@ -1,9 +1,25 @@
-rec 1
-(u,s,t,l) = (29,17,37,41)
+#rec 1
+#(u,s,t,l) = (29,17,37,41)
+#mexp, id, pos, mat, tmat1, tmat2
 19937,1,156,B5026F5AA96619E9,D66B5EF5B4DA0000,fded6be000000000
 19937,2,156,f6a3f020f058b7a7,28aaf6cdbdb40000,fdedeae000000000
-rec 2
-(u,s,t,l) = (26,17,33,39)
+
+-v -r 1 19937,1,156,B5026F5AA96619E9,29,17,37,41,ffffffffffffffff,D66B5EF5B4DA0000,fded6be000000000
+-v -r 1 19937,2,156,f6a3f020f058b7a7,29,17,37,41,ffffffffffffffff,28aaf6cdbdb40000,fdedeae000000000
+
+#rec 2
+#(u,s,t,l) = (26,17,33,39)
+#mexp, id, pos1, pos2, pos3, mat, tmat1, tmat2
 19937,3,63,151,224,b3815b624fc82e2f,599cfcbfca660000,fffaaffe00000000
 19937,4,55,122,268,8ebd4ad46cb39a1e,656bedffd9a40000,fdfece7e00000000
 19937,5,87,148,241,cacb98f78ebcd4ed,a51dbeffda6c0000,ffee9bf600000000
+
+-v -r 2 19937,3,63,151,224,b3815b624fc82e2f,29,17,33,39,599cfcbfca660000,fffaaffe00000000
+-v -r 2 19937,4,55,122,268,8ebd4ad46cb39a1e,29,17,33,39,656bedffd9a40000,fdfece7e00000000
+-v -r 2 19937,5,87,148,241,cacb98f78ebcd4ed,29,17,33,39,a51dbeffda6c0000,ffee9bf600000000
+
+
+#MT19937-64 (2014/2/23 version) rec1 id1 tempering change
+#(u,s,t,l) = (29,17,37,43)
+#mexp, id, pos, mat, tmat0, tmat1, tmat2
+19937,1,156,B5026F5AA96619E9,5555555555555555,71D67FFFEDA60000,FFF7EEE000000000

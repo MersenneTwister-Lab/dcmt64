@@ -41,8 +41,6 @@ namespace MTToolBox {
     public:
         int mexp;
         int pos1;
-        int pos2;
-        int pos3;
         int tsh0;
         int tsh1;
         int tsh2;
@@ -61,18 +59,14 @@ namespace MTToolBox {
             id = 0;
             seq = 0;
             pos1 = 0;
-            pos2 = 0;
-            pos3 = 0;
             mat = 0;
-            // rec 2
-            tmsk0 = tmsk0ff;
+            tmsk0 = 0;
             tmsk1 = 0;
             tmsk2 = 0;
-            // rec 2
-            tsh0 = 26;
-            tsh1 = 17;
-            tsh2 = 33;
-            tsh3 = 39;
+            tsh0 = 0;
+            tsh1 = 0;
+            tsh2 = 0;
+            tsh3 = 0;
         }
 
         mt64rec1_param(const mt64rec1_param& src) {
@@ -80,8 +74,6 @@ namespace MTToolBox {
             id = src.id;
             seq = src.seq;
             pos1 = src.pos1;
-            pos2 = src.pos2;
-            pos2 = src.pos2;
             mat = src.mat;
             tmsk0 = src.tmsk0;
             tmsk1 = src.tmsk1;
@@ -96,7 +88,7 @@ namespace MTToolBox {
          * @return header line of output.
          */
         const string get_header() const {
-            return "mexp, id, pos1, pos2, pos3, mat, tsh0, tsh1, tsh2, tsh3,"
+            return "mexp, id, pos1, mat, tsh0, tsh1, tsh2, tsh3,"
                 " tmsk0, tmsk1, tmsk2";
         }
 
@@ -109,8 +101,6 @@ namespace MTToolBox {
             ss << dec << mexp << ",";
             ss << dec << id << ",";
             ss << dec << pos1 << ",";
-            ss << dec << pos2 << ",";
-            ss << dec << pos3 << ",";
             ss << hex << setw(16) << setfill('0') << mat << ",";
             ss << dec << setw(0) << tsh0 << ",";
             ss << dec << setw(0) << tsh1 << ",";
@@ -133,8 +123,6 @@ namespace MTToolBox {
             ss << "mexp:" << dec << mexp << endl;
             ss << "id:" << dec << id << endl;
             ss << "pos1:" << dec << pos1 << endl;
-            ss << "pos2:" << dec << pos2 << endl;
-            ss << "pos3:" << dec << pos3 << endl;
             ss << "mat:" << hex << setw(16) << setfill('0') << mat << endl;
             ss << "tsh0:" << dec << setw(0) << tsh0 << endl;
             ss << "tsh1:" << dec << setw(0) << tsh1 << endl;
@@ -144,7 +132,14 @@ namespace MTToolBox {
             ss << "tmsk1:" << hex << setw(16) << setfill('0') << tmsk1 << endl;
             ss << "tmsk2:" << hex << setw(16) << setfill('0') << tmsk2 << endl;
             string s;
-            ss >> s;
+            string t;
+            while (ss) {
+                ss >> t;
+                if (!ss) {
+                    break;
+                }
+                s = s + t + '\n';
+            }
             return s;
         }
     };
@@ -169,12 +164,7 @@ namespace MTToolBox {
             state = new uint64_t[size];
             param.mexp = mexp;
             param.id = id;
-            //param.pos = 0;
-            //param.mat = 0;
-            //param.tmsk1 = 0;
-            //param.tmsk2 = 0;
             index = 0;
-            //fixedPOS = -1;
             reverse_bit_flag = false;
             make_mask(mexp);
         }
@@ -242,8 +232,6 @@ namespace MTToolBox {
             uint64_t x = (state[index] & upper_mask)
                 | (state[(index + 1) % size] & lower_mask);
             state[index] = state[(index + param.pos1) % size]
-                ^ state[(index + param.pos2) % size]
-                ^ state[(index + param.pos3) % size]
                 ^ (x >> 1);
             if (x & 1) {
                 state[index] ^= param.mat;
@@ -298,14 +286,6 @@ namespace MTToolBox {
          */
         void setUpParam(ParameterGenerator& mix) {
             param.pos1 = mix.getUint64() % (size - 1) + 1;
-            param.pos2 = mix.getUint64() % (size - 1) + 1;
-            while (param.pos1 == param.pos2) {
-                param.pos2 = mix.getUint64() % (size - 1) + 1;
-            }
-            param.pos3 = mix.getUint64() % (size - 1) + 1;
-            while (param.pos1 == param.pos3 || param.pos2 == param.pos3) {
-                param.pos3 = mix.getUint64() % (size - 1) + 1;
-            }
             uint32_t seq = mix.getUint32();
             param.seq = seq;
             seq = seq ^ (seq << 15) ^ (seq << 23);

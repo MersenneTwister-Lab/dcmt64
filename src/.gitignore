@@ -1,0 +1,6 @@
+*.o
+.deps/
+*~
+calc_equidist
+dcmt64
+Makefile
