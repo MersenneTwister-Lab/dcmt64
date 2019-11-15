@@ -2,6 +2,7 @@
 #include "mt64Rec1Search.hpp"
 #include "mt64Rec2Search.hpp"
 #include <MTToolBox/AlgorithmEquidistribution.hpp>
+#include <MTToolBox/AlgorithmPartialBitPattern.hpp>
 #include <MTToolBox/AlgorithmReducibleRecursionSearch.hpp>
 #include <MTToolBox/period.hpp>
 #include <NTL/GF2X.h>
@@ -41,6 +42,8 @@ int main(int argc, char * argv[])
         return -1;
     }
     if (opt.rectype == 1) {
+        opt.paramsrec1.tmsk1 = 0;
+        opt.paramsrec1.tmsk2 = 0;
         mt64rec1 mt(opt.paramsrec1);
         if (opt.verbose) {
             cout << opt.paramsrec1.get_debug_string() << endl;
@@ -248,19 +251,20 @@ namespace {
 
         stsl1 apbp1;
         stsl2 apbp2;
+        mt.seed(1);
         mt.setTmpIdx(0);
         apbp1(mt, false);
         mt.setTmpIdx(1);
         apbp2(mt, false);
-        AlgorithmEquidistribution<uint64_t> equi(mt, 64, opt.mexp);
+        AlgorithmEquidistribution<uint64_t> equi(mt, 64, mexp);
         int veq[64];
         int delta = equi.get_all_equidist(veq);
-        os << g.getParamString();
-        os << "," << dec << delta << endl;
+        cout << mt.getParamString();
+        cout << "," << dec << delta << endl;
         for (int j = 0; j < 64; j++) {
             cout << "k(" << dec << (j + 1) << ") = " << dec << veq[j];
             cout << "\td(" << dec << (j + 1) << ") = " << dec
-                 << (opt.mexp / (j + 1) - veq[j]) << endl;
+                 << (mexp / (j + 1) - veq[j]) << endl;
         }
     }
 
