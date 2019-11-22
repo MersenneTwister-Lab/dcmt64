@@ -248,7 +248,6 @@ namespace MTToolBox {
             } else {
                 w = generate();
             }
-            w = generate();
             uint64_t mask = 0;
             mask = ~mask;
             mask = mask << (64 - bit_len);

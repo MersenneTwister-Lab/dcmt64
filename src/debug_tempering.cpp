@@ -5,6 +5,7 @@
 #include <MTToolBox/AlgorithmPartialBitPattern.hpp>
 #include <MTToolBox/AlgorithmReducibleRecursionSearch.hpp>
 #include <MTToolBox/period.hpp>
+#include <MTToolBox/util.hpp>
 #include <NTL/GF2X.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -244,6 +245,8 @@ namespace {
     template<class G>
     void search_tempering(G& mt, options& opt, int mexp, bool verbose)
     {
+        UNUSED_VARIABLE(&opt);
+        UNUSED_VARIABLE(&verbose);
         // 64 - 17 = 47
         // 64 - 37 = 27
         typedef AlgorithmPartialBitPattern<uint64_t, 64, 1, 47, 5> stsl1;

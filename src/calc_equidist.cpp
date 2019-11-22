@@ -249,7 +249,8 @@ namespace {
         }
         int delta = 0;
         int veq[64];
-        AlgorithmEquidistribution<uint64_t> equi(mt, 64, mexp);
+        //AlgorithmEquidistribution<uint64_t> equi(mt, 64, mexp);
+        AlgorithmEquidistribution<uint64_t> equi(mt, 64);
         delta = equi.get_all_equidist(veq);
         cout << mt.getParamString();
         cout << "," << dec << delta << endl;
@@ -257,8 +258,9 @@ namespace {
             cout << "64bit dimension of equidistribution at v-bit accuracy k(v)"
                  << endl;
             for (int j = 0; j < 64; j++) {
-                cout << "k(" << dec << (j + 1) << ") = " << dec << veq[j];
-                cout << "\td(" << dec << (j + 1) << ") = " << dec
+                cout << "k(" << dec << setw(2) << (j + 1) << ") = "
+                     << setw(5) << veq[j];
+                cout << "\td(" << setw(2) << (j + 1) << ") = " << setw(5)
                      << (mexp / (j + 1) - veq[j]) << endl;
             }
         }
